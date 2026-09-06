@@ -1,25 +1,30 @@
-name: ROF_OfflineReward
+name: ROF_LoyaltyRewards
 version: '${project.version}'
-main: me.rof_offlinereward.ROF_OfflineReward
+main: me.rof_loyaltyrewards.ROF_LoyaltyRewards
 api-version: 1.13
 authors: [ RageOfFire ]
-description: A plugin that help you give reward for offline player!
+description: A plugin that rewards players for their offline and online loyalty!
 softdepend: [PlaceholderAPI]
 commands:
-  rofofflinereward:
+  rofloyaltyrewards:
     description: Manage plugin
-    usage: /rofofflinereward <command>
+    usage: /rofloyaltyrewards <command>
     aliases:
       - rofow
+      - loyaltyrewards
       - offlinereward
       - ow
+      - lr
 permission:
   rofow.admin:
     description: Permission for admin user plugin
     default: op
   rofow.exempt:
     description: Permission allow player not earning reward
-    default: op
+    default: false
   rofow.alert:
     description: Alert when someone got reward
     default: op
+  rofow.gui:
+    description: Permission to open the reward preview GUI
+    default: true

@@ -1,13 +1,15 @@
 #####################################################
-#               ROF_OfflineReward                   #
+#               ROF_LoyaltyRewards                  #
 #               by RageOfFire                       #
 #####################################################
 
 # Time formatter:
-# d = day
-# h = hour
-# m = minute
-# s = second
+# mo = month (30 days)
+# d  = day
+# h  = hour
+# m  = minute
+# s  = second
+# Example: "1mo 5d 6h 30m 20s"
 
 # Placeholder:
 # %player% is a player name
@@ -25,15 +27,20 @@ min-time-play: "10d"
 # this is an option to log out information when player got reward
 # console: Will send a message to console
 # player: Will send a message to player have permission (rofow.alert)
-# file: Will send a message to file name "logs.txt"
+# file: Will send a message to file name "log.txt"
 logs:
   console: true
   player: true
   file: false
 
+# Whether the "online-rewards" section below is active at all.
+# When enabled, each online reward fires the instant a player's session
+# reaches its "time" requirement (real elapsed time, not a periodic scan).
+online-rewards-enabled: true
+
 messages:
-  usage: '&cUsage: /rofofflinereward <command>'
-  reload: '&aSuccessfully reloaded ROF_OfflineReward plugin!'
+  usage: '&cUsage: /rofloyaltyrewards <reload|gui>'
+  reload: '&aSuccessfully reloaded ROF_LoyaltyRewards plugin!'
   # Placeholder
   # %player% is a player name earn reward
   # %reward% is the reward id
@@ -41,7 +48,21 @@ messages:
   alert: '&e%player% just got a reward %reward% for %time% offline'
 
 #########################################
-#               Rewards                 #
+#                 GUI                   #
+#########################################
+
+gui:
+  # Title of the reward GUI (opened via /rofloyaltyrewards gui, and
+  # automatically on join - see auto-open-on-join below).
+  title: '&8Loyalty Rewards'
+  # If true, the reward GUI automatically opens for a returning player when
+  # they have at least one claimable offline reward waiting - they click it
+  # to claim, rather than it being applied silently. If false, eligible
+  # offline rewards are granted automatically on join with no GUI.
+  auto-open-on-join: true
+
+#########################################
+#            Offline Rewards            #
 #########################################
 
 # Now time to get some explain
@@ -56,7 +77,7 @@ messages:
 #
 # default is your custom id must be unique for each reward
 # permission is a permission required to earn that reward (if none permission is set the reward will give to all player by default)
-# time is the time player offline or higher your can use time with Time formatter
+# time is the time player offline or higher, using the Time formatter above (mo/d/h/m/s)
 # message is the optional message to send to that player
 # execute is a way the command will be execute "PLAYER" or "CONSOLE"
 # commands is a list command to execute for that player
@@ -79,6 +100,14 @@ rewards:
       - "say Welcome back, %player%!"
       - "give %player% gold_ingot 5"
 
+  veteran:
+    permission: ""
+    time: "1mo"
+    message: "&6Welcome back after a whole month! Here's something special."
+    execute: 'CONSOLE'
+    commands:
+      - "give %player% diamond_block 1"
+
 # Don't want to reward player ? You can also punish them for being offline too
   punish:
     permission: "permission.to.punish"
@@ -88,3 +117,76 @@ rewards:
     commands:
       - "me off the server for 1 week"
       - "effect give %player% slowness 30 2 true"
+
+#########################################
+#            Online Rewards             #
+#########################################
+
+# Same format as "rewards" above, but "time" here is real elapsed time in the
+# player's CURRENT online session. Each reward fires automatically and
+# instantly the moment the player reaches it - no GUI needed since they're
+# already online to receive it.
+
+online-rewards:
+  loyal:
+    permission: ""
+    time: "1h"
+    message: "&aThanks for playing! Here's a little something."
+    execute: 'CONSOLE'
+    commands:
+      - "give %player% bread 3"
+
+  dedicated:
+    permission: ""
+    time: "5h"
+    message: "&6You're a dedicated player! Enjoy this reward."
+    execute: 'CONSOLE'
+    commands:
+      - "give %player% diamond 1"
+
+#########################################
+#             Login Rewards             #
+#########################################
+
+# Same format again, but "time" here means "how often this can be claimed" -
+# not a duration the player has to wait through. Each entry is granted
+# automatically and instantly the moment a player joins, as long as at least
+# "time" has passed since they last claimed that specific entry. There's no
+# requirement to stay online at all - just log in again after the interval.
+#
+# This is what you'd use for daily/weekly/monthly login rewards - just set
+# each entry's "time" to whatever cadence you want. Nothing else changes.
+
+login-reward:
+  daily:
+    permission: ""
+    time: "1d"
+    message: "&aThanks for logging in today! Here's your daily reward."
+    execute: 'CONSOLE'
+    commands:
+      - "give %player% golden_apple 1"
+
+  weekly:
+    permission: ""
+    time: "7d"
+    message: "&6A whole week of logins - here's a weekly bonus!"
+    execute: 'CONSOLE'
+    commands:
+      - "give %player% emerald 5"
+
+  monthly:
+    permission: ""
+    time: "1mo"
+    message: "&dThanks for a month of playing! Enjoy this monthly reward."
+    execute: 'CONSOLE'
+    commands:
+      - "give %player% netherite_ingot 1"
+
+  # Custom interval example - any mo/d/h/m/s combination works the same way.
+  every-12-hours:
+    permission: ""
+    time: "12h"
+    message: "&eTwice-a-day login bonus!"
+    execute: 'CONSOLE'
+    commands:
+      - "give %player% iron_ingot 2"
